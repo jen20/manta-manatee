@@ -97,6 +97,27 @@ publish: release
 	mkdir -p $(BITS_DIR)/manta-manatee
 	cp $(ROOT)/$(RELEASE_TARBALL) $(BITS_DIR)/manta-manatee/$(RELEASE_TARBALL)
 
+.PHONY: pg96
+pg96:
+	git clone http://git.postgresql.org/git/postgresql.git postgresql96
+	cd postgresql96 && git checkout REL9_6_3
+	cd postgresql96 && env \
+		ac_cv_header_sys_ucred_h=no \
+		./configure \
+			--prefix=/opt/local/postgresql96 \
+			--enable-debug \
+			--enable-dtrace \
+			--enable-nls \
+			--with-openssl \
+			--with-readline \
+			--without-perl \
+			--without-python \
+			--without-tcl \
+			--without-zlib
+	cd postgres96 && make
+	cd postgres96 && env \
+		DEST_DIR="$(RELSTAGEDIR)/root" \
+		make install
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.node_prebuilt.targ
